@@ -13,9 +13,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "AIBA Technologie — Software & AI engineering studio",
+  title: "AIBA Technology — Solutions IA & digitales nouvelle generation",
   description:
-    "AIBA Technologie is a software and AI engineering studio. We design and build web apps, intelligent automation, and cloud platforms that move business forward.",
+    "AIBA Technologie accompagne les entreprises dans leur transformation digitale grace a des solutions IA innovantes : chatbots, agents IA, automatisation, sites web, e-commerce et plateformes SaaS.",
 };
 
 export default function RootLayout({
@@ -25,7 +25,7 @@ export default function RootLayout({
 }>) {
   return (
     <html
-      lang="en"
+      lang="fr"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">{children}</body>

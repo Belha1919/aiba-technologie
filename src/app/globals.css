@@ -1,17 +1,33 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Deep-space dark palette (Figma redesign) */
+  --background: #06070f;
+  --background-2: #0a0c18;
+  --foreground: #eef0fa;
 
-  /* Monochrome ink ramp (zinc) — kept within the original palette */
-  --surface: #fafafa;
-  --line: rgba(0, 0, 0, 0.08);
-  --line-strong: rgba(0, 0, 0, 0.14);
-  --muted: #52525b; /* zinc-600 — ≥4.5:1 on white */
-  --faint: #a1a1aa; /* zinc-400 — decorative only */
+  --surface: rgba(255, 255, 255, 0.025);
+  --surface-2: rgba(255, 255, 255, 0.04);
+  --line: rgba(255, 255, 255, 0.08);
+  --line-strong: rgba(255, 255, 255, 0.16);
+  --muted: #9aa1bd; /* secondary text */
+  --faint: #5a6184; /* decorative / labels */
 
-  /* Motion — strong custom curves (Emil) */
+  /* Accent ramp — blue → violet → magenta (from brand swatches) */
+  --accent-blue: #1e9bf0;
+  --accent-indigo: #2a0a6b;
+  --accent-violet: #7c2db5;
+  --accent-magenta: #c01a9c;
+  --accent: var(--accent-violet);
+
+  --grad: linear-gradient(
+    120deg,
+    var(--accent-blue) 0%,
+    var(--accent-violet) 52%,
+    var(--accent-magenta) 100%
+  );
+
+  /* Motion */
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
   --ease-out-quart: cubic-bezier(0.165, 0.84, 0.44, 1);
   --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
@@ -23,20 +39,9 @@
   --color-surface: var(--surface);
   --color-muted: var(--muted);
   --color-faint: var(--faint);
+  --color-accent: var(--accent);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-    --surface: #111111;
-    --line: rgba(255, 255, 255, 0.1);
-    --line-strong: rgba(255, 255, 255, 0.18);
-    --muted: #a1a1aa; /* zinc-400 — ≥4.5:1 on near-black */
-    --faint: #52525b;
-  }
 }
 
 * {
@@ -55,52 +60,162 @@ body {
   text-rendering: optimizeLegibility;
 }
 
-/* Hairline grid texture for atmosphere (not a solid bg) */
+/* Ambient aurora glows behind the page */
+.aurora {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
+.aurora::before,
+.aurora::after {
+  content: "";
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(120px);
+  opacity: 0.5;
+}
+.aurora::before {
+  width: 38rem;
+  height: 38rem;
+  top: -12rem;
+  left: -6rem;
+  background: radial-gradient(circle at center, var(--accent-blue), transparent 65%);
+}
+.aurora::after {
+  width: 34rem;
+  height: 34rem;
+  top: -8rem;
+  right: -8rem;
+  background: radial-gradient(circle at center, var(--accent-magenta), transparent 65%);
+}
+
+/* Hairline grid texture */
 .bg-grid {
   background-image:
     linear-gradient(to right, var(--line) 1px, transparent 1px),
     linear-gradient(to bottom, var(--line) 1px, transparent 1px);
   background-size: 64px 64px;
-  -webkit-mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, #000 30%, transparent 75%);
-  mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, #000 30%, transparent 75%);
+  -webkit-mask-image: radial-gradient(ellipse 90% 60% at 50% 0%, #000 25%, transparent 75%);
+  mask-image: radial-gradient(ellipse 90% 60% at 50% 0%, #000 25%, transparent 75%);
 }
 
-/* ---- Load reveal (hero) ---- */
+/* Gradient text */
+.text-grad {
+  background: var(--grad);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Card: transparent fill + gradient border only (border drawn on ::before) */
+.card {
+  position: relative;
+  border-radius: 1rem;
+  background: transparent;
+}
+.card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1.5px;
+  background: var(--grad);
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+          mask-composite: exclude;
+  pointer-events: none;
+}
+
+/* Gradient ring border (for highlighted cards) */
+.ring-grad {
+  border: 1px solid transparent;
+  background:
+    linear-gradient(var(--background-2), var(--background-2)) padding-box,
+    var(--grad) border-box;
+}
+
+/* Buttons */
+.btn-grad {
+  background: var(--grad);
+  color: #ffffff;
+  box-shadow: 0 8px 30px -8px rgba(124, 45, 181, 0.7);
+}
+.btn-outline {
+  border: 1px solid var(--line-strong);
+  background: var(--surface);
+}
+.btn-outline:hover {
+  border-color: var(--accent-magenta);
+  background: var(--surface-2);
+}
+
+/* Gradient-ring button: dark fill, gradient border (pill) */
+.btn-ring {
+  border: 2px solid transparent;
+  background:
+    linear-gradient(var(--background), var(--background)) padding-box,
+    var(--grad) border-box;
+  color: var(--foreground);
+}
+.btn-ring:hover {
+  box-shadow: 0 8px 30px -10px rgba(124, 45, 181, 0.7);
+  background:
+    linear-gradient(var(--background-2), var(--background-2)) padding-box,
+    var(--grad) border-box;
+}
+
+/* Icon chip */
+.icon-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 0.75rem;
+  border: 1px solid var(--line);
+  background: linear-gradient(180deg, rgba(124, 45, 181, 0.18), transparent);
+  color: var(--accent-blue);
+}
+
+/* Progress bar */
+.progress {
+  height: 0.5rem;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+}
+.progress > span {
+  display: block;
+  height: 100%;
+  border-radius: 9999px;
+  background: var(--grad);
+}
+
+/* ---- Load reveal ---- */
 @keyframes rise {
-  from {
-    opacity: 0;
-    transform: translateY(14px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
 }
-
 .rise {
   opacity: 0;
   animation: rise 0.8s var(--ease-out-quart) forwards;
 }
-
-/* Stagger steps */
 .d1 { animation-delay: 0.05s; }
 .d2 { animation-delay: 0.13s; }
 .d3 { animation-delay: 0.21s; }
 .d4 { animation-delay: 0.29s; }
 .d5 { animation-delay: 0.37s; }
-
-/* Marquee for the capability ticker */
-@keyframes marquee {
-  from { transform: translateX(0); }
-  to { transform: translateX(-50%); }
-}
-.marquee-track {
-  animation: marquee 32s linear infinite;
-}
+.d6 { animation-delay: 0.45s; }
 
 /* ---- Interaction primitives ---- */
 .press {
-  transition: transform 0.16s var(--ease-out);
+  transition: transform 0.16s var(--ease-out), box-shadow 0.3s var(--ease-out),
+    border-color 0.3s var(--ease-out), background 0.3s var(--ease-out),
+    opacity 0.2s var(--ease-out);
 }
 .press:active {
   transform: scale(0.97);
@@ -111,52 +226,41 @@ body {
   background-size: 0% 1px;
   background-repeat: no-repeat;
   background-position: 0 100%;
-  transition: background-size 0.3s var(--ease-out-quart);
+  transition: background-size 0.3s var(--ease-out-quart), color 0.3s var(--ease-out);
 }
 .link-underline:hover {
   background-size: 100% 1px;
 }
 
-@media (hover: hover) and (pointer: fine) {
-  .row-hover .row-arrow {
-    transform: translateX(-6px);
-    opacity: 0;
-    transition: transform 0.3s var(--ease-out), opacity 0.3s var(--ease-out);
-  }
-  .row-hover:hover .row-arrow {
-    transform: translateX(0);
-    opacity: 1;
-  }
-  .row-hover .row-index {
-    transition: color 0.3s var(--ease-out);
-  }
-  .row-hover:hover .row-index {
-    color: var(--foreground);
-  }
+/* Form fields */
+.field {
+  width: 100%;
+  border-radius: 0.75rem;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  padding: 0.85rem 1rem;
+  color: var(--foreground);
+  font-size: 0.95rem;
+  transition: border-color 0.25s var(--ease-out), background 0.25s var(--ease-out);
+}
+.field::placeholder {
+  color: var(--faint);
+}
+.field:focus {
+  outline: none;
+  border-color: var(--accent-violet);
+  background: var(--surface-2);
 }
 
 /* ---- Accessibility ---- */
 @media (prefers-reduced-motion: reduce) {
-  html {
-    scroll-behavior: auto;
-  }
-  .rise {
-    opacity: 1;
-    animation: none;
-  }
-  .marquee-track {
-    animation: none;
-  }
-  .press,
-  .link-underline,
-  .row-arrow,
-  .row-index {
-    transition: none;
-  }
+  html { scroll-behavior: auto; }
+  .rise { opacity: 1; animation: none; }
+  .press, .link-underline, .card { transition: none; }
 }
 
 :focus-visible {
-  outline: 2px solid var(--foreground);
+  outline: 2px solid var(--accent-violet);
   outline-offset: 3px;
-  border-radius: 2px;
+  border-radius: 4px;
 }
