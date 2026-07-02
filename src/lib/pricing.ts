@@ -172,10 +172,17 @@ export function localEstimate(message: string, lang: ChatLang): string {
 // --- Off-topic guard helpers ---
 
 const INTENT_WORDS = [
+  // intent / pricing
   "prix", "tarif", "cout", "coût", "combien", "budget", "devis", "estimation",
   "projet", "site", "web", "app", "appli", "application", "plateforme",
   "boutique", "logiciel", "developp", "développ", "price", "cost", "how much",
   "quote", "project", "website", "build", "besoin", "creer", "créer",
+  // common project features (so follow-up answers stay on-topic)
+  "stock", "paiement", "payment", "produit", "product", "livraison", "panier",
+  "reservation", "réservation", "rendez-vous", "facture", "facturation",
+  "utilisateur", "user", "page", "pages", "seo", "design", "api", "dashboard",
+  "admin", "blog", "abonnement", "fonctionnalite", "fonctionnalité", "feature",
+  "delai", "délai", "mois", "semaine",
 ];
 
 const GREETINGS = ["bonjour", "salut", "bonsoir", "coucou", "hello", "hi", "hey", "yo"];

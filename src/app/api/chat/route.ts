@@ -19,9 +19,12 @@ type ChatMessage = { role: "user" | "assistant"; content: string };
  * Only called when the keyword fast-path (hasTopicSignal) found nothing.
  * Returns true (on-topic) on any error to avoid falsely refusing real users.
  */
-async function isOnTopic(message: string): Promise<boolean> {
-  const prompt = `Tu es un classifieur strict pour AIBA (agence digitale & IA).
-Le message demande-t-il de concevoir/estimer/chiffrer un projet digital ou IA (site, app web, e-commerce, réservation, marketplace, app mobile, SaaS, chatbot, agent IA, automatisation) ou pose-t-il une question de prix/budget sur un tel projet ? Une salutation ou une intention vague de projet = OUI. Écrire/expliquer du code, culture générale, maths, actualités, blagues, autres tâches = NON.
+async function isOnTopic(message: string, context: string): Promise<boolean> {
+  const ctx = context
+    ? `\nContexte — l'assistant venait de demander : """${context}"""\nLe message peut donc être une réponse courte à cette question.`
+    : "";
+  const prompt = `Tu es un classifieur strict pour AIBA (agence digitale & IA).${ctx}
+Le message concerne-t-il un projet digital ou IA (site, app web, e-commerce, réservation, marketplace, app mobile, SaaS, chatbot, agent IA, automatisation), une de ses fonctionnalités, un délai/budget, OU une réponse à la question de l'assistant ci-dessus ? Une salutation ou une intention de projet = OUI. Écrire/expliquer du code, culture générale, maths, actualités, blagues, autres tâches = NON.
 Message: """${message}"""
 Réponds par UN SEUL mot: OUI ou NON.`;
   try {
@@ -57,12 +60,15 @@ export async function POST(req: Request) {
   }
 
   const lastUser = [...messages].reverse().find((m) => m.role === "user")?.content ?? "";
+  const prevAssistant =
+    [...messages].reverse().find((m) => m.role === "assistant")?.content ?? "";
   const system = buildSystemPrompt(lang);
 
   // 1) Try the local model (Ollama). Fail fast if it isn't running.
   try {
-    // Off-topic guard: keyword fast-path, else ask the model to classify.
-    if (!hasTopicSignal(lastUser) && !(await isOnTopic(lastUser))) {
+    // Off-topic guard: keyword fast-path, else ask the model to classify
+    // (with the previous assistant turn as context, so short answers pass).
+    if (!hasTopicSignal(lastUser) && !(await isOnTopic(lastUser, prevAssistant))) {
       return new Response(offTopicReply(lang), {
         headers: {
           "Content-Type": "text/plain; charset=utf-8",
