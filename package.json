@@ -3,10 +3,13 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "predev": "node scripts/start-ollama.mjs",
     "dev": "next dev",
     "build": "next build",
+    "prestart": "node scripts/start-ollama.mjs",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "ollama": "node scripts/start-ollama.mjs"
   },
   "dependencies": {
     "@radix-ui/react-slot": "^1.3.0",
