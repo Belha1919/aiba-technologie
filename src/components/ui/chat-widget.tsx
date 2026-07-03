@@ -8,7 +8,7 @@ type Lang = "fr" | "en";
 
 const T = {
   fr: {
-    title: "Estimation tarif",
+    title: "AIBA Chat",
     subtitle: "Assistant IA · réponse instantanée",
     greeting:
       "Bonjour 👋 Décrivez votre projet (site, e-commerce, app mobile, SaaS, chatbot…) et je vous donne une estimation de tarif.",
